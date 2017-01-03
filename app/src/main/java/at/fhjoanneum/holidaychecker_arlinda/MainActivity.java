@@ -35,28 +35,29 @@ import java.util.Locale;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
+public class MainActivity extends Activity  implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-    private Location mLastLocation;
+
+    //GUI
+    private Button buttonShowLocation, btnSubmit;
+    private TextView lblLocation;
+    private Spinner spinner1;
+    private CalendarPickerView calendar;
+
+    private String myCurrentLoc;
+
+    //Location variables
     private GoogleApiClient mGoogleApiClient;
     private boolean mRequestLocationUpdates = false;
+    private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private static int UPDATE_INTERVAL = 10000;
     private static int FASTEST_INTERVAL = 5000;
     private static int DISPLACEMENT = 10;
-    private TextView lblLocation;
-    private Button btnShowLocation, btnStartLocationUpdates;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private int MY_PERMISSIONS_REQUEST_LOCATION;
-    private String myCurrentLoc;
-
-    private Spinner spinner1, spinner2, spinner3;
-
-    private CalendarPickerView calendar;
-
-    private Button btnSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,26 +65,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         setContentView(R.layout.activity_main);
 
         lblLocation = (TextView) findViewById(R.id.lblLocation);
-        btnShowLocation = (Button) findViewById(R.id.buttonShowLocation);
         if (checkPlayServices()){
             buildGoogleApiClient();
             createLocationRequest();
         }
         //displayLocation();
-        addListenerOnSpinnerItemSelection();
+       // addListenerOnSpinnerItemSelection();
         addListenerOnButton();
-
-
-        btnShowLocation.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                displayLocation();
-                if(myCurrentLoc != ""){
-                    int index = getIndex(spinner1, myCurrentLoc);
-                    spinner1.setSelection(index);
-                }
-
-            }
-        });
 
         /* Calendar */
         Calendar nextYear = Calendar.getInstance();
@@ -96,28 +84,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 .inMode(CalendarPickerView.SelectionMode.RANGE);
         calendar.highlightDates(getHolidays());
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id){
-            case R.id.action_settings:
-                return true;
-            case R.id.action_next:
-                ArrayList<Date> selectedDates = (ArrayList<Date>)calendar
-                        .getSelectedDates();
-                Toast.makeText(MainActivity.this, selectedDates.toString(),
-                        Toast.LENGTH_LONG).show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private ArrayList<Date> getHolidays(){
@@ -188,7 +154,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 }
 
                 myCurrentLoc=add;
-                //lblLocation.setText(myCurrentLoc);
+                lblLocation.setText(myCurrentLoc);
             }
             catch (IOException e1) {
                 e1.printStackTrace();
@@ -199,20 +165,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             }
         }
     }
-    /*
-    private void togglePeriodLocationUpdates() {
-        if (!mRequestLocationUpdates) {
-            btnStartLocationUpdates.setText(getString(R.string.btn_stop_location_updates));
-            mRequestLocationUpdates = true;
-            startLocationUpdates();
-        } else {
-            btnStartLocationUpdates.setText(getString(R.string.btn_start_location_updates));
-            mRequestLocationUpdates = false;
-            stopLocationUpdates();
-        }
 
-    }
-*/
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
     }
@@ -283,39 +236,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         displayLocation();
     }
 
-
-    // add items into spinner dynamically
-    /*
-    public void addItemsOnSpinner2() {
-
-        spinner2 = (Spinner) findViewById(R.id.spinner2);
-        List<String> list = new ArrayList<String>();
-        list.add("list 1");
-        list.add("list 3");
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, list);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner2.setAdapter(dataAdapter);
-    }*/
-
-    public void addListenerOnSpinnerItemSelection() {
-        spinner1 = (Spinner) findViewById(R.id.spinner1);
-        spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
-
-
-       /*
-        Log.i(TAG, myCurrentLoc);
-
-        for(int i =0; i<list.size(); i++){
-            if(list.get(i).equals(lblLocation.getText())){
-                Log.i(TAG, list.get(i));
-                spinner1.setSelection(i);
-            }
-        }*/
-    }
-
-
-    //private method of your class
     private int getIndex(Spinner spinner, String myString)
     {
         int index = 0;
@@ -334,6 +254,18 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
         spinner1 = (Spinner) findViewById(R.id.spinner1);
         btnSubmit = (Button) findViewById(R.id.buttonSubmit);
+        buttonShowLocation = (Button) findViewById(R.id.buttonShowLocation);
+
+        buttonShowLocation.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                displayLocation();
+                if(myCurrentLoc != ""){
+                    int index = getIndex(spinner1, myCurrentLoc);
+                    spinner1.setSelection(index);
+                }
+
+            }
+        });
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
 
@@ -342,12 +274,19 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 Date date = calendar.getSelectedDate();
                 Date endDate  = calendar.getSelectedDates().get(calendar.getSelectedDates().size() -1);
 
+                
+
+                /*
                 Toast.makeText(MainActivity.this,
                                 "\nLocation : "+ String.valueOf(spinner1.getSelectedItem()) + "\nSelected dates : " +date +endDate,
                         Toast.LENGTH_SHORT).show();
+                */
             }
 
         });
+
+
+        
     }
 
 }
