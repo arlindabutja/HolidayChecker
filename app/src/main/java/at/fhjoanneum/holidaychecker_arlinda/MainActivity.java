@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,7 +29,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.timessquare.CalendarPickerView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,14 +60,12 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     private boolean mRequestLocationUpdates = false;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
-    private static int UPDATE_INTERVAL = 10000;
-    private static int FASTEST_INTERVAL = 5000;
-    private static int DISPLACEMENT = 10;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private int MY_PERMISSIONS_REQUEST_LOCATION;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -69,8 +74,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
             buildGoogleApiClient();
             createLocationRequest();
         }
-        //displayLocation();
-       // addListenerOnSpinnerItemSelection();
+
         addListenerOnButton();
 
         /* Calendar */
@@ -87,6 +91,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     }
 
     private ArrayList<Date> getHolidays(){
+
         //SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy");
         //Date dateInString =  new Date();
         Date date = new Date();
@@ -103,34 +108,23 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
 
     @Override
     protected void onStart() {
+
         super.onStart();
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        checkPlayServices();
-        if (mGoogleApiClient.isConnected() && mRequestLocationUpdates)
-            startLocationUpdates();
-    }
-
-    @Override
     protected void onStop() {
+
         super.onStop();
         checkPlayServices();
         if (mGoogleApiClient.isConnected())
             mGoogleApiClient.disconnect();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
     private void displayLocation() {
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -167,18 +161,18 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     }
 
     protected synchronized void buildGoogleApiClient() {
+
         mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
     }
 
     protected void createLocationRequest() {
+
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
     }
 
     private boolean checkPlayServices() {
+
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
         if(result != ConnectionResult.SUCCESS) {
@@ -191,53 +185,33 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
         return true;
     }
 
-    protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-    }
-
-    protected void stopLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-        }
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-    }
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+
         displayLocation();
-        if (mRequestLocationUpdates){
-            startLocationUpdates();
-        }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+
         mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
         Log.i(TAG, "Connection failed: " + connectionResult.getErrorCode());
     }
 
     @Override
     public void onLocationChanged(Location location) {
+
         mLastLocation = location;
         Toast.makeText(getApplicationContext(), "Location changed", Toast.LENGTH_SHORT);
         displayLocation();
     }
 
-    private int getIndex(Spinner spinner, String myString)
-    {
+    private int getIndex(Spinner spinner, String myString){
         int index = 0;
 
         for (int i=0;i<spinner.getCount();i++){
@@ -274,6 +248,9 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                 Date date = calendar.getSelectedDate();
                 Date endDate  = calendar.getSelectedDates().get(calendar.getSelectedDates().size() -1);
 
+                String googleApiUrl = "http://kayaposoft.com/enrico/json/v1.0/?action=getPublicHolidaysForDateRange&fromDate=04-07-2012&toDate=04-07-2014&country=usa&region=District+Of+Columbia";
+                HttpHelper helper = new HttpHelper();
+                helper.execute(googleApiUrl);
                 
 
                 /*
@@ -284,9 +261,45 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
             }
 
         });
+    }
 
+    public class HttpHelper extends AsyncTask<String, Void, String> {
 
-        
+        @Override
+        protected String doInBackground(String... params) {
+
+            StringBuilder out = new StringBuilder();
+            try {
+
+                // get the string parameter from execute()
+                URL url = new URL(params[0]);
+
+                // create Urlconnection
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
+                // read inputstrem
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    out.append(line);
+                }
+                Log.i("INTERNET", out.toString());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return out.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            super.onPostExecute(s);
+            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+
+        }
     }
 
 }
