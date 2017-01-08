@@ -8,35 +8,45 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="@color/view_bg"
-    tools:context="at.fhjoanneum.holidaychecker_arlinda.MainActivity">>
+    tools:context="at.fhjoanneum.holidaychecker_arlinda.MainActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="30dp"
         android:gravity="center"
-        android:text="@string/current_location"
-        android:id="@+id/currentLoc"/>
+        android:paddingTop="20dp"
+        android:text="@string/title"
+        android:id="@+id/title"/>
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="30dp" />
 
     <Button
-    android:id="@+id/buttonShowLocation"
-    android:layout_width="250dp"
-    android:layout_height="30dp"
-    android:layout_marginTop="15dp"
-    android:background="@color/btn_gb"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:text="@string/btn_get_location"
-    android:textColor="@color/white"/>
+        android:id="@+id/buttonShowLocation"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/btn_gb"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/btn_get_location"
+        android:textColor="@color/white"/>
 
     <TextView
-    android:id="@+id/lblLocation"
-    android:padding="15dp"
-    android:layout_width="246dp"
-    android:layout_height="35dp"
-    android:textColor="@color/white"
-    android:textSize="16dp"
-    android:layout_gravity="center_horizontal" />
+        android:id="@+id/lblLocation"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:textSize="16dp"
+        android:textColor="@color/colorAccent"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="50dp" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="30dp" />
 
     <Spinner
         android:layout_width="250dp"
@@ -44,75 +54,40 @@
         android:gravity="center"
         android:background="@android:drawable/btn_dropdown"
         android:spinnerMode="dropdown"
-        android:entries="@array/country_arrays"
+        android:entries="@array/countries_array"
+        android:entryValues="@array/countries"
         android:prompt="@string/country_prompt"
         android:id="@+id/spinner1"/>
 
-    <Button
-    android:layout_width="250dp"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:layout_alignParentBottom="true"
-    android:layout_centerHorizontal="true"
-    android:layout_marginBottom="0dp"
-    android:text="@string/btn_submit"
-    android:id="@+id/buttonSubmit"/>
-
     <Space
-    android:layout_width="fill_parent"
-    android:layout_height="20dp" />
+        android:layout_width="fill_parent"
+        android:layout_height="10dp" />
 
-    <com.squareup.timessquare.CalendarPickerView
-    android:id="@+id/calendar_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentTop="true"/>
-
-    <!--
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:layout_centerHorizontal="true"
-        android:textSize="16dp"
-        android:layout_marginLeft="5dp"
-        android:text="@string/date_from"
-        android:id="@+id/dateFrom" />
-
-    <Spinner
+    <EditText
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"
-        android:id="@+id/spinner2"/>
+        android:focusable="false"
+        android:hint="from...to date"
+        android:id="@+id/selectDateRange" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="100dp" />
+
+    <Button
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="0dp"
+        android:text="@string/btn_submit"
+        android:id="@+id/buttonSubmit"/>
 
     <Space
         android:layout_width="fill_parent"
         android:layout_height="20dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_centerHorizontal="true"
-            android:textSize="16dp"
-            android:text="@string/date_until"
-            android:id="@+id/dateUntil"
-            android:layout_marginLeft="5dp" />
-
-
-        <Spinner
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:background="@android:drawable/btn_dropdown"
-            android:spinnerMode="dropdown"
-            android:id="@+id/spinner3"/> -->
-
-    <Space
-    android:layout_width="fill_parent"
-    android:layout_height="50dp" />
 
 </LinearLayout>
 

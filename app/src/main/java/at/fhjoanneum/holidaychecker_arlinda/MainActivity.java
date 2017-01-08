@@ -2,7 +2,12 @@ package at.fhjoanneum.holidaychecker_arlinda;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -12,11 +17,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +47,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -52,8 +65,13 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     private TextView lblLocation;
     private Spinner spinner1;
     private CalendarPickerView calendar;
+    public static EditText setDateRange;
 
     private String myCurrentLoc;
+
+    //Calendar
+    String fromDateStr;
+    String toDateStr;
 
     //Location variables
     private GoogleApiClient mGoogleApiClient;
@@ -69,41 +87,52 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         lblLocation = (TextView) findViewById(R.id.lblLocation);
         if (checkPlayServices()){
             buildGoogleApiClient();
             createLocationRequest();
         }
 
+        //Spinner func.
         addListenerOnButton();
+        setDateRange = (EditText) findViewById(R.id.selectDateRange);
+        System.out.println("setDate: "+ setDateRange.getText());
 
-        /* Calendar */
-        Calendar nextYear = Calendar.getInstance();
-        nextYear.add(Calendar.YEAR, 1);
+        setDateRange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                //To show current date in the datepicker
+                /*
+                Calendar mcurrentDate=Calendar.getInstance();
+                int mYear=mcurrentDate.get(Calendar.YEAR);
+                int mMonth=mcurrentDate.get(Calendar.MONTH);
+                int mDay=mcurrentDate.get(Calendar.DAY_OF_MONTH);
 
-        calendar = (CalendarPickerView) findViewById(R.id.calendar_view);
-        Date today = new Date();
-        calendar.init(today, nextYear.getTime())
-                .withSelectedDate(today)
-                .inMode(CalendarPickerView.SelectionMode.RANGE);
-        calendar.highlightDates(getHolidays());
+                DatePickerDialog mDatePicker=new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
+                    //      Your code   to get date and time
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                selectDateRange.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
 
-    }
+                            }
+                    }
+                },mYear, mMonth, mDay);
+                mDatePicker.setTitle("Select date");
+                mDatePicker.show();*/
 
-    private ArrayList<Date> getHolidays(){
+                Intent i=new Intent(MainActivity.this, CalendarActivity.class);
+                startActivity(i);
 
-        //SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy");
-        //Date dateInString =  new Date();
-        Date date = new Date();
-        /*
-        try {
-            date = sdf.parse(dateInString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
-        ArrayList<Date> holidays = new ArrayList<>();
-        holidays.add(date);
-        return holidays;
+                //CalendarActivity.updateEditTextView();
+            }
+        });
     }
 
     @Override
@@ -137,7 +166,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
             double latitude = mLastLocation.getLatitude();
             double longtitude = mLastLocation.getLongitude();
 
-            Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
+            Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.ENGLISH);
             try {
                 List<Address> addresses = geoCoder.getFromLocation(latitude, longtitude, 1);
 
@@ -148,13 +177,14 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                 }
 
                 myCurrentLoc=add;
-                lblLocation.setText(myCurrentLoc);
+                //System.out.println("add" +add);
+                //lblLocation.setText(myCurrentLoc);
             }
             catch (IOException e1) {
                 e1.printStackTrace();
             }
         } else {
-            if(myCurrentLoc !=""){
+            if(myCurrentLoc != null){
                 lblLocation.setText("The GPS is disabled or the device is not supported");
             }
         }
@@ -207,37 +237,51 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     public void onLocationChanged(Location location) {
 
         mLastLocation = location;
-        Toast.makeText(getApplicationContext(), "Location changed", Toast.LENGTH_SHORT);
+        Toast.makeText(getApplicationContext(), "Location changed", Toast.LENGTH_SHORT).show();
         displayLocation();
-    }
-
-    private int getIndex(Spinner spinner, String myString){
-        int index = 0;
-
-        for (int i=0;i<spinner.getCount();i++){
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
-                index = i;
-                break;
-            }
-        }
-        return index;
     }
 
     // get the selected dropdown list value
     public void addListenerOnButton() {
 
         spinner1 = (Spinner) findViewById(R.id.spinner1);
+        String[] countryName;
+        List<String> listNames = new ArrayList<String>();
+        List<String> listCode = new ArrayList<String>();
+
+        String[] countryArrays = getResources().getStringArray(R.array.countries_array);
+        for (int i = 0; i < countryArrays.length; i++) {
+            String country = countryArrays[i];
+            countryName = country.split("-");
+            listNames.add(countryName[0]);
+            listCode.add(countryName[1]);
+        }
+
+
+        ArrayAdapter<String> dataAdapterNames = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, listNames);
+
+        //ArrayAdapter<String> dataAdapterCode = new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_spinner_dropdown_item, countryArrays);
+
+        // Assign adapter to ListView
+        spinner1.setAdapter(dataAdapterNames);
+
         btnSubmit = (Button) findViewById(R.id.buttonSubmit);
         buttonShowLocation = (Button) findViewById(R.id.buttonShowLocation);
 
         buttonShowLocation.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 displayLocation();
-                if(myCurrentLoc != ""){
-                    int index = getIndex(spinner1, myCurrentLoc);
+                System.out.println("myCurrentLoc:"+myCurrentLoc);
+
+                System.out.println("lblLocation: "+lblLocation.getText());
+
+                if(myCurrentLoc != null){
+                    System.out.println("myCurrentLoc Inside:"+myCurrentLoc);
+                    int index = getIndex(spinner1,myCurrentLoc);
                     spinner1.setSelection(index);
                 }
-
             }
         });
 
@@ -245,61 +289,38 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
 
             @Override
             public void onClick(View v) {
-                Date date = calendar.getSelectedDate();
-                Date endDate  = calendar.getSelectedDates().get(calendar.getSelectedDates().size() -1);
+                //Get the data selected by the user and executed the userinput
+                Bundle bundleCalendar = getIntent().getExtras();
 
-                String googleApiUrl = "http://kayaposoft.com/enrico/json/v1.0/?action=getPublicHolidaysForDateRange&fromDate=04-07-2012&toDate=04-07-2014&country=usa&region=District+Of+Columbia";
-                HttpHelper helper = new HttpHelper();
-                helper.execute(googleApiUrl);
-                
+                if(bundleCalendar != null){
+                    fromDateStr = bundleCalendar.getString("fromDateStr");
+                    toDateStr= bundleCalendar.getString("toDateStr");
+                    Intent intent = new Intent(MainActivity.this, ListHolidays.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("SpinnerValue",spinner1.getSelectedItem().toString());
+                    bundle.putString("date",fromDateStr);
+                    bundle.putString("endDate",toDateStr);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "Please select a date range!", Toast.LENGTH_SHORT).show();
+                }
 
-                /*
-                Toast.makeText(MainActivity.this,
-                                "\nLocation : "+ String.valueOf(spinner1.getSelectedItem()) + "\nSelected dates : " +date +endDate,
-                        Toast.LENGTH_SHORT).show();
-                */
             }
 
         });
     }
 
-    public class HttpHelper extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            StringBuilder out = new StringBuilder();
-            try {
-
-                // get the string parameter from execute()
-                URL url = new URL(params[0]);
-
-                // create Urlconnection
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-
-                // read inputstrem
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    out.append(line);
-                }
-                Log.i("INTERNET", out.toString());
-
-            } catch (Exception e) {
-                e.printStackTrace();
+    private int getIndex(Spinner spinner, String myString){
+        int index = 0;
+        for (int i=0;i<spinner.getCount();i++){
+            String country = spinner.getItemAtPosition(i).toString().trim();
+            if (country.equalsIgnoreCase(myString)){
+                index = i;
+                break;
             }
-
-            return out.toString();
         }
-
-        @Override
-        protected void onPostExecute(String s) {
-
-            super.onPostExecute(s);
-            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
-
-        }
+        return index;
     }
 
 }
