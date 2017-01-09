@@ -48,9 +48,12 @@ import com.squareup.timessquare.CalendarPickerView;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
@@ -172,14 +175,34 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                 List<Address> addresses = geoCoder.getFromLocation(latitude, longtitude, 1);
 
                 String add = "";
+                String fullAdd = "";
+
                 if (addresses.size() > 0)
                 {
                     add = addresses.get(0).getCountryName();
+
+
+                    String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                    String city = addresses.get(0).getLocality();
+                    String state = addresses.get(0).getAdminArea();
+                    String country = addresses.get(0).getCountryName();
+                    String postalCode = addresses.get(0).getPostalCode();
+                    String knownName = addresses.get(0).getFeatureName();
+                    fullAdd = address +"--"+ city +"--"+ state +"--"+ country +"--"+ postalCode +"--"+ knownName +"\n";
                 }
 
                 myCurrentLoc=add;
                 //System.out.println("add" +add);
-                //lblLocation.setText(myCurrentLoc);
+                lblLocation.setText(fullAdd);
+
+                FileOutputStream fileout=openFileOutput("mytextfile.txt", MODE_PRIVATE);
+                OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
+                outputWriter.write(fullAdd);
+                outputWriter.close();
+                
+                File file = getFileStreamPath("mytextfile.txt");
+                String path = file.getPath();
+
             }
             catch (IOException e1) {
                 e1.printStackTrace();
@@ -199,7 +222,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     protected void createLocationRequest() {
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private boolean checkPlayServices() {
@@ -283,7 +306,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                     int index = getIndex(spinner1,myCurrentLoc);
                     spinner1.setSelection(index);
                 }
-                displayContacts();
+               // displayContacts();
             }
         });
 
