@@ -3,16 +3,22 @@ package at.fhjoanneum.holidaychecker_arlinda;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -79,7 +85,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-    private int MY_PERMISSIONS_REQUEST_LOCATION;
+    private int MY_PERMISSIONS_REQUEST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +139,8 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                 //CalendarActivity.updateEditTextView();
             }
         });
+
+        checkPermissions();
     }
 
     @Override
@@ -154,13 +162,6 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
 
     private void displayLocation() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-
-        }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
@@ -282,6 +283,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                     int index = getIndex(spinner1,myCurrentLoc);
                     spinner1.setSelection(index);
                 }
+                displayContacts();
             }
         });
 
@@ -311,7 +313,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
         });
     }
 
-    private int getIndex(Spinner spinner, String myString){
+    public int getIndex(Spinner spinner, String myString){
         int index = 0;
         for (int i=0;i<spinner.getCount();i++){
             String country = spinner.getItemAtPosition(i).toString().trim();
@@ -321,6 +323,86 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
             }
         }
         return index;
+    }
+
+
+    public void displayContacts() {
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                if (Integer.parseInt(cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                            new String[]{id}, null);
+                    while (pCur.moveToNext()) {
+                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        Toast.makeText(MainActivity.this, "Name: " + name + ", Phone No: " + phoneNo, Toast.LENGTH_SHORT).show();
+                        updateContact(name, "1111111");
+                    }
+                    pCur.close();
+                }
+            }
+        }
+    }
+
+    public void updateContact(String name, String phone) {
+        ContentResolver cr = getContentResolver();
+
+        String where = ContactsContract.Data.DISPLAY_NAME + " = ? AND " +
+                ContactsContract.Data.MIMETYPE + " = ? AND " +
+                String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE) + " = ? ";
+        String[] params = new String[] {name,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_HOME)};
+
+        Cursor phoneCur = getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, where, params, null);
+
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+
+        if ( (null == phoneCur)  ) {
+            Toast.makeText(MainActivity.this, "Contact does not exist", Toast.LENGTH_SHORT).show();
+        } else {
+            ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                    .withSelection(where, params)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.DATA, phone)
+                    .build());
+        }
+
+        phoneCur.close();
+
+        try {
+            cr.applyBatch(ContactsContract.AUTHORITY, ops);
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (OperationApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Toast.makeText(MainActivity.this, "Updated the phone number of" + name +" to: " + phone, Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void checkPermissions(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS}, MY_PERMISSIONS_REQUEST);
+
+        }
+
     }
 
 }
