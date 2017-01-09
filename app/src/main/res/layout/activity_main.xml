@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/view_bg"
+    tools:context="at.fhjoanneum.holidaychecker_arlinda.MainActivity"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:text="@string/title"
+        android:id="@+id/title"/>
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="30dp" />
+
+    <Button
+        android:id="@+id/buttonShowLocation"
+        android:layout_width="250dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/btn_gb"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/btn_get_location"
+        android:textColor="@color/white"
+        android:layout_height="35dp" />
+
+    <TextView
+        android:id="@+id/lblLocation"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:textSize="16dp"
+        android:textColor="@color/colorAccent"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="50dp"
+        android:layout_weight="0.21" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="30dp" />
+
+    <Spinner
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@android:drawable/btn_dropdown"
+        android:entries="@array/countries_array"
+        android:prompt="@string/country_prompt"
+        android:id="@+id/spinner1"
+        android:layout_width="250dp" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="10dp" />
+
+    <EditText
+        android:layout_width="250dp"
+        android:layout_height="35dp"
+        android:gravity="center"
+        android:focusable="false"
+        android:hint="from...to date"
+        android:id="@+id/selectDateRange" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:layout_weight="0.38" />
+
+    <Button
+        android:layout_width="250dp"
+        android:layout_height="35dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:text="@string/btn_submit"
+        android:id="@+id/buttonSubmit"
+        android:paddingEnd="0dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/btn_gb"
+        android:textColor="@color/white" />
+
+</LinearLayout>

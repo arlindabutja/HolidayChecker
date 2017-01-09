@@ -1,0 +1,203 @@
+<resources>
+    <string name="app_name">HolidayChecker</string>
+    <string name="title">Holiday Checker App</string>
+    <string name="action_settings">Settings</string>
+    <string name="lbl_you_are_at">You are at</string>
+    <string name="btn_get_location">Get my location</string>
+    <string name="btn_start_location_updates">Start location updates</string>
+    <string name="btn_stop_location_updates">Stop location updates</string>
+
+    <string name="current_location">Current Location</string>
+    <string name="holiday_list">List of Holidays</string>
+    <string name="date_from">From:</string>
+    <string name="date_until">Until:</string>
+    <string name="btn_submit">Submit</string>
+    <string name="country_prompt">Set your location</string>
+    <string name="select_date_range">Select date range</string>
+    <string name="date_button_set">Set date</string>
+
+    <string-array name="countries_array">
+        <item>
+            <name>Angola</name>
+            <code>(AGO)</code>
+        </item>
+        <item>
+            <name>Australia</name>
+            <code>(AUS)</code>
+        </item>
+        <item>
+            <name>Austria</name>
+            <code>(AUT)</code>
+        </item>
+        <item>
+            <name>Belgium</name>
+            <code>(BEL)</code>
+        </item>
+        <item>
+            <name>Brazil</name>
+            <code>(BRA)</code>
+        </item>
+        <item>
+            <name>Canada</name>
+            <code>(CAN)</code>
+        </item>
+
+        <item>
+            <name>China</name>
+            <code>(CHN)</code>
+        </item>
+        <item>
+            <name>Colombia</name>
+            <code>(COL)</code>
+        </item>
+        <item>
+            <name>Croatia</name>
+            <code>(HRV)</code>
+        </item>
+        <item>
+            <name>Czech Republic</name>
+            <code>(CZE)</code>
+        </item>
+        <item>
+            <name>Denmark</name>
+            <code>(DNK)</code>
+        </item>
+        <item>
+            <name>England</name>
+            <code>(ENG)</code>
+        </item>
+        <item>
+            <name>Estonia</name>
+            <code>(EST)</code>
+        </item>
+        <item>
+            <name>Finland</name>
+            <code>(FIN)</code>
+        </item>
+        <item>
+            <name>France</name>
+            <code>(FRA)</code>
+        </item>
+        <item>
+            <name>Germany</name>
+            <code>(DEU)</code>
+        </item>
+        <item>
+            <name>Hong Kong</name>
+            <code>(HKG)</code>
+        </item>
+        <item>
+            <name>Hungary</name>
+            <code>(HUN)</code>
+        </item>
+        <item>
+            <name>Iceland</name>
+            <code>(ISL)</code>
+        </item>
+        <item>
+            <name>Ireland</name>
+            <code>(IRL)</code>
+        </item>
+        <item>
+            <name>Isle of Man</name>
+            <code>(IMN)</code>
+        </item>
+        <item>
+            <name>Israel</name>
+            <code>(ISR)</code>
+        </item>
+        <item>
+            <name>Italy</name>
+            <code>(ITA)</code>
+        </item>
+        <item>
+            <name>Japan</name>
+            <code>(JPN)</code>
+        </item>
+        <item>
+            <name>Latvia</name>
+            <code>(LVA)</code>
+        </item>
+        <item>
+            <name>Lithuania</name>
+            <code>(LTU)</code>
+        </item>
+        <item>
+            <name>Luxembourg</name>
+            <code>(LUX)</code>
+        </item>
+        <item>
+            <name>Mexico</name>
+            <code>(MEX)</code>
+        </item>
+        <item>
+            <name>Netherlands</name>
+            <code>(NLD)</code>
+        </item>
+        <item>
+            <name>New Zealand</name>
+            <code>(NZL)</code>
+        </item>
+         <item>
+            <name>Northern Ireland</name>
+            <code>(NIR)</code>
+        </item>
+         <item>
+            <name>Norway</name>
+            <code>(NOR)</code>
+        </item>
+         <item>
+            <name>Poland</name>
+            <code>(POL)</code>
+        </item>
+         <item>
+            <name>Portugal</name>
+            <code>(PRT)</code>
+        </item>
+         <item>
+            <name>Romania</name>
+            <code>(ROU)</code>
+        </item>
+         <item>
+            <name>Russia</name>
+            <code>(RUS)</code>
+        </item>
+         <item>
+            <name>Serbia</name>
+            <code>(SRB)</code>
+        </item>
+         <item>
+            <name>Slovakia</name>
+            <code>(SVK)</code>
+        </item>
+         <item>
+            <name>Slovenia</name>
+            <code>(SVN)</code>
+        </item>
+         <item>
+            <name>South Africa</name>
+            <code>(ZAF)</code>
+        </item>
+         <item>
+            <name>South Korea</name>
+            <code>(KOR)</code>
+        </item>
+         <item>
+            <name>Scotland</name>
+            <code>(SCT)</code>
+        </item>
+         <item>
+            <name>Sweden</name>
+            <code>(SWE)</code>
+        </item>
+         <item>
+            <name>Ukraine</name>
+            <code>(UKR)</code>
+        </item>
+         <item>
+            <name>United States of America</name>
+            <code>(USA)</code>
+        </item>
+    </string-array>
+
+</resources>
