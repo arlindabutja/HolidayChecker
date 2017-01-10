@@ -76,8 +76,6 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
     private Button buttonShowLocation, btnSubmit;
     private TextView lblLocation;
     private Spinner spinner1;
-    //private CalendarPickerView calendar;
-    //public static EditText setDateRange;
     private Bundle bundleCalendar;
     private String countryCode;
     private String countryName;
@@ -197,6 +195,7 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
 
                 myCurrentLoc=add;
                 lblLocation.setVisibility(View.GONE);
+                //System.out.println("add" +add);
                 lblLocation.setText(fullAdd);
 
                 FileOutputStream fileout=openFileOutput("mytextfile.txt", MODE_PRIVATE);
@@ -295,6 +294,9 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
                     int index = getIndex(spinner1,myCurrentLoc);
                     spinner1.setSelection(index);
                 }
+                System.out.println("myCurrentLoc:"+myCurrentLoc);
+
+               // displayContacts();
             }
         });
 
@@ -302,7 +304,6 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
 
             @Override
             public void onClick(View v) {
-
                 countryName = spinner1.getSelectedItem().toString().split("\\(")[1];
                 countryCode = countryName.split("\\)")[0];
 
@@ -376,7 +377,6 @@ public class MainActivity extends Activity  implements GoogleApiClient.Connectio
             }
         });
     }
-
 
     public void displayContacts() {
         ContentResolver cr = getContentResolver();

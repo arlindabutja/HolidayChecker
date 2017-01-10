@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by arlinda on 06.01.2017.
+ * Created by test on 06.01.2017.
  */
 
 public class CalendarActivity extends Activity {
